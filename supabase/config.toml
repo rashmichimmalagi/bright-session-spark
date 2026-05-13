@@ -1,0 +1,4 @@
+project_id = "tcbkgfqepipgfzbtjkxk"
+
+[functions.direct-password-reset]
+verify_jwt = false
