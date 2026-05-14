@@ -417,6 +417,15 @@ function AssignmentsTab({ sessions, assignments, submissions, students }: { sess
 
   const handleCreate = async () => {
     if (!form.sessionId || !form.title) { toast.error('Session and title are required'); return; }
+    if (form.deadline) {
+      const dl = new Date(form.deadline);
+      if (isNaN(dl.getTime())) { toast.error('Invalid deadline'); return; }
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dlDay = new Date(dl.getFullYear(), dl.getMonth(), dl.getDate());
+      if (dlDay < today) { toast.error('Past dates are not allowed'); return; }
+      if (dl.getTime() <= now.getTime()) { toast.error('Selected deadline time has already passed'); return; }
+    }
     setUploading(true);
     try {
       let fileUrl: string | null = null, fileName: string | null = null;
@@ -462,7 +471,7 @@ function AssignmentsTab({ sessions, assignments, submissions, students }: { sess
               </select>
             </div>
             <div><Label>Title *</Label><Input value={form.title} onChange={e => u('title', e.target.value)} autoComplete="off" className="mt-1 bg-secondary/50" /></div>
-            <div><Label>Deadline</Label><Input type="datetime-local" value={form.deadline} onChange={e => u('deadline', e.target.value)} className="mt-1 bg-secondary/50" /></div>
+            <div><Label>Deadline</Label><Input type="datetime-local" min={new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)} value={form.deadline} onChange={e => u('deadline', e.target.value)} className="mt-1 bg-secondary/50" /></div>
             <div className="flex items-end gap-2">
               <input id="allow-resub" type="checkbox" checked={form.allowResubmit} onChange={e => u('allowResubmit', e.target.checked)} />
               <label htmlFor="allow-resub" className="text-sm">Allow re-submissions before deadline</label>
